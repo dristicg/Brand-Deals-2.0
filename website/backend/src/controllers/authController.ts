@@ -116,3 +116,48 @@ export const loginUser = async (
   }
 };
 
+/**
+ * @desc    Google OAuth Register/Login
+ * @route   POST /api/v1/auth/google
+ * @access  Public
+ */
+export const googleLogin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { name, email, googleId } = req.body;
+
+    if (!email || !googleId) {
+      return next(new AppError('Email and Google ID are required', 400));
+    }
+
+    // Try finding user by googleId
+    let user = await User.findOne({ googleId });
+
+    if (!user) {
+      // Try finding user by email
+      user = await User.findOne({ email });
+
+      if (user) {
+        // Link googleId to existing standard user
+        user.googleId = googleId;
+        await user.save();
+      } else {
+        // Create new Google User account (password is not required for Google accounts)
+        user = await User.create({
+          name: name || email.split('@')[0],
+          email,
+          googleId,
+        });
+      }
+    }
+
+    sendTokenResponse(user, 200, res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
