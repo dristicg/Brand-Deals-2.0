@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
-import { RegisterSchema } from '../utils/authValidators';
+import { RegisterSchema, LoginSchema } from '../utils/authValidators';
 import { AppError } from '../utils/AppError';
 
 /**
@@ -82,3 +82,37 @@ export const registerUser = async (
     next(error);
   }
 };
+
+/**
+ * @desc    Authenticate user & get token
+ * @route   POST /api/v1/auth/login
+ * @access  Public
+ */
+export const loginUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    // Parse and validate incoming login body properties using Zod
+    const validatedData = LoginSchema.parse(req.body);
+    const { email, password } = validatedData;
+
+    // Check if user exists (explicitly select password since it has select: false)
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+      return next(new AppError('Invalid credentials', 401));
+    }
+
+    // Verify if password matches hashed database version
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      return next(new AppError('Invalid credentials', 401));
+    }
+
+    sendTokenResponse(user, 200, res);
+  } catch (error) {
+    next(error);
+  }
+};
+
