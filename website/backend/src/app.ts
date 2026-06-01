@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './routes/authRoutes';
+import productRoutes from './routes/productRoutes';
 
 const app = express();
 
@@ -51,6 +52,7 @@ app.get('/api/v1/health', (req: Request, res: Response) => {
 
 // Mount Routes mapping
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/products', productRoutes);
 
 // Unhandled route fallback
 app.use('*', (req: Request, res: Response) => {
