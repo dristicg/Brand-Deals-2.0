@@ -1,0 +1,178 @@
+/* =========================================
+   BRAND DEALS — Product Listing Page Styles
+   ========================================= */
+
+.wrapper {
+  padding: var(--space-xl) 0 var(--space-4xl) 0;
+}
+
+.pageHeader {
+  margin-bottom: var(--space-2xl);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-lg);
+}
+
+.title {
+  font-size: var(--text-4xl);
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ---------- Layout Columns ---------- */
+.layout {
+  display: flex;
+  gap: var(--space-xl);
+}
+
+.sidebarColumn {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.productsColumn {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+/* ---------- Results Header ---------- */
+.resultsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.countText {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.countHighlight {
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
+
+/* ---------- Products Grid ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+}
+
+/* ---------- No Results ---------- */
+.noResults {
+  text-align: center;
+  padding: var(--space-4xl) var(--space-xl);
+  background: var(--color-bg-secondary);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  max-width: 500px;
+  margin: var(--space-xl) auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.noResultsTitle {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.noResultsDesc {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.resetBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--color-accent);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+
+.resetBtn:hover {
+  background: var(--color-accent-hover);
+}
+
+/* ---------- Pagination ---------- */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-3xl);
+}
+
+.pageBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+
+.pageBtn:hover:not(:disabled) {
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
+  background: var(--color-bg-elevated);
+}
+
+.pageBtnActive {
+  background: var(--color-accent);
+  border-color: var(--color-accent-hover);
+  color: #ffffff;
+}
+
+.pageBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+  .sidebarColumn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .title {
+    font-size: var(--text-3xl);
+  }
+}
