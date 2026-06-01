@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { fetchProducts } from '@/lib/api';
 import type { Product } from '@/types';
+import ProductCard from '@/components/ProductCard/ProductCard';
 import styles from './page.module.css';
 
 // Stunning fallback products if the backend returns no results
@@ -138,73 +138,9 @@ export default async function Home() {
         </div>
 
         <div className={styles.productsGrid}>
-          {products.map((product) => {
-            const hasDiscount = product.comparePrice && product.comparePrice > product.price;
-            const discountPct = hasDiscount
-              ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
-              : 0;
-
-            return (
-              <div key={product._id} className="glass-card" style={{ padding: 'var(--space-md)', position: 'relative', display: 'flex', flexDirection: 'column', height: '100%', cursor: 'pointer' }}>
-                <Link href={`/product/${product.slug}`} style={{ display: 'flex', flexDirection: 'column', height: '100%', color: 'inherit' }}>
-                  {/* Image Container */}
-                  <div style={{ position: 'relative', width: '100%', aspectRatio: '1', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: 'var(--color-bg-secondary)', marginBottom: 'var(--space-md)' }}>
-                    <Image
-                      src={product.images[0]}
-                      alt={product.name}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                      style={{ objectFit: 'cover', transition: 'transform var(--transition-slow)' }}
-                    />
-                    {hasDiscount && (
-                      <span className="badge badge--danger" style={{ position: 'absolute', top: 'var(--space-sm)', right: 'var(--space-sm)', zIndex: 2 }}>
-                        {discountPct}% OFF
-                      </span>
-                    )}
-                    <span className="badge" style={{ position: 'absolute', bottom: 'var(--space-sm)', left: 'var(--space-sm)', zIndex: 2, background: 'rgba(0,0,0,0.6)', border: '1px solid var(--color-border)', fontSize: '10px' }}>
-                      {product.brand}
-                    </span>
-                  </div>
-
-                  {/* Metadata */}
-                  <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-accent)', fontWeight: 600, textTransform: 'uppercase', marginBottom: 'var(--space-xs)' }}>
-                      {product.category} &bull; {product.gender}
-                    </span>
-                    <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 700, margin: '0 0 var(--space-sm) 0', color: 'var(--color-text-primary)', lineClamp: 2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', height: '2.4em', lineHeight: '1.2em' }}>
-                      {product.name}
-                    </h3>
-
-                    {/* Ratings */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)', marginBottom: 'var(--space-md)' }}>
-                      <span style={{ color: 'var(--color-warning)', fontSize: '14px' }}>&#9733;</span>
-                      <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>{product.ratingsAverage.toFixed(1)}</span>
-                      <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>({product.ratingsCount})</span>
-                    </div>
-
-                    {/* Pricing & CTA */}
-                    <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        {hasDiscount && (
-                          <span style={{ fontSize: 'var(--text-xs)', textDecoration: 'line-through', color: 'var(--color-text-muted)' }}>
-                            &#8377;{product.comparePrice.toLocaleString('en-IN')}
-                          </span>
-                        )}
-                        <span style={{ fontSize: 'var(--text-lg)', fontWeight: 800, color: 'var(--color-text-primary)' }}>
-                          &#8377;{product.price.toLocaleString('en-IN')}
-                        </span>
-                      </div>
-                      <span style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background var(--transition-fast)' }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="white" style={{ width: '18px', height: '18px', margin: 'auto' }}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              </div>
-            );
-          })}
+          {products.map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
         </div>
       </section>
     </div>
