@@ -6,6 +6,7 @@ import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './routes/authRoutes';
 import productRoutes from './routes/productRoutes';
 import userRoutes from './routes/userRoutes';
+import cartRoutes from './routes/cartRoutes';
 
 const app = express();
 
@@ -55,6 +56,7 @@ app.get('/api/v1/health', (req: Request, res: Response) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/cart', cartRoutes);
 
 // Unhandled route fallback
 app.use('*', (req: Request, res: Response) => {
