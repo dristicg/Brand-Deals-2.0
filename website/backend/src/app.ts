@@ -7,6 +7,7 @@ import authRoutes from './routes/authRoutes';
 import productRoutes from './routes/productRoutes';
 import userRoutes from './routes/userRoutes';
 import cartRoutes from './routes/cartRoutes';
+import wishlistRoutes from './routes/wishlistRoutes';
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/cart', cartRoutes);
+app.use('/api/v1/wishlist', wishlistRoutes);
 
 // Unhandled route fallback
 app.use('*', (req: Request, res: Response) => {
