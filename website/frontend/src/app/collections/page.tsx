@@ -234,7 +234,7 @@ export default async function CollectionsPage({ searchParams }: PageProps) {
     gender: typeof resolvedParams.gender === 'string' ? resolvedParams.gender : undefined,
     minPrice: typeof resolvedParams.minPrice === 'string' ? resolvedParams.minPrice : undefined,
     maxPrice: typeof resolvedParams.maxPrice === 'string' ? resolvedParams.maxPrice : undefined,
-    sort: typeof resolvedParams.sort === 'string' ? (resolvedParams.sort as any) : undefined,
+    sort: typeof resolvedParams.sort === 'string' ? (resolvedParams.sort as ProductQueryParams['sort']) : undefined,
     page: typeof resolvedParams.page === 'string' ? resolvedParams.page : '1',
     limit: '6',
   };

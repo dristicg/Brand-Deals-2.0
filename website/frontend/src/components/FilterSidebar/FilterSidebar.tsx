@@ -26,6 +26,7 @@ export default function FilterSidebar() {
 
   // Keep state in sync with URL changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearchTerm(searchParams.get('search') || '');
     setMinPrice(searchParams.get('minPrice') || '');
     setMaxPrice(searchParams.get('maxPrice') || '');

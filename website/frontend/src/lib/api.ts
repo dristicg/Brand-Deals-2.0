@@ -83,7 +83,7 @@ export async function fetchProductBySlug(
    ======================================================== */
 
 // Helper to get request options (handles method, JSON payload, and Cookie/Authorization)
-function getFetchOptions(method: string, body?: any, token?: string): RequestInit {
+function getFetchOptions(method: string, body?: unknown, token?: string): RequestInit {
   const headers: Record<string, string> = {};
   if (body) {
     headers['Content-Type'] = 'application/json';

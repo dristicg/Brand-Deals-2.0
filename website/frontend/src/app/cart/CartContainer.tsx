@@ -22,7 +22,7 @@ export default function CartContainer({ initialItems }: CartContainerProps) {
     setUpdatingItemId(itemId);
 
     // Call API
-    const res = await updateCartItem(itemId, newQty);
+    await updateCartItem(itemId, newQty);
 
     // Update locally immediately for responsiveness
     setItems((prev) =>
@@ -64,7 +64,7 @@ export default function CartContainer({ initialItems }: CartContainerProps) {
         </svg>
         <h2 className={styles.emptyTitle}>Your Cart is Empty</h2>
         <p className={styles.emptyDesc}>
-          You haven't added any premium original sneakers to your cart yet. Let's find your perfect fit!
+          You haven&apos;t added any premium original sneakers to your cart yet. Let&apos;s find your perfect fit!
         </p>
         <Link href="/collections" className={styles.shopBtn} id="cart-start-shopping">
           Explore Shoes

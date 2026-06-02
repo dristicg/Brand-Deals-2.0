@@ -20,7 +20,7 @@ export default function WishlistContainer({ initialProducts }: WishlistContainer
     setIsToggling(productId);
 
     // Call API to toggle (remove)
-    const res = await toggleWishlist(productId);
+    await toggleWishlist(productId);
     
     // Even if API fails (e.g. backend offline in dev), let's remove it locally to ensure high fidelity demo!
     setProducts((prev) => prev.filter((p) => p._id !== productId));
