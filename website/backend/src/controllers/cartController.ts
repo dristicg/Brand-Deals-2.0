@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
 import Cart from '../models/Cart';
 import Product from '../models/Product';
 import { AppError } from '../utils/AppError';
@@ -96,7 +97,11 @@ export const addItemToCart = async (
       cart.items[existingItemIndex].quantity = newQty;
     } else {
       // Add new item
-      cart.items.push({ product: productId, size, quantity });
+      cart.items.push({
+        product: new mongoose.Types.ObjectId(productId) as any,
+        size,
+        quantity,
+      });
     }
 
     await cart.save();
