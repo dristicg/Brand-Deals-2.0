@@ -29,6 +29,10 @@ export default function ProfileContainer({ initialUser }: ProfileContainerProps)
   const [postalCode, setPostalCode] = useState('');
   const [country, setCountry] = useState('India');
 
+  // Location detection state
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
   // Handle Profile Update
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +62,8 @@ export default function ProfileContainer({ initialUser }: ProfileContainerProps)
     setState('');
     setPostalCode('');
     setCountry('India');
+    setLocationError(null);
+    setIsDetectingLocation(false);
     setShowAddressForm(true);
   };
 
@@ -70,6 +76,8 @@ export default function ProfileContainer({ initialUser }: ProfileContainerProps)
     setState(addr.state);
     setPostalCode(addr.postalCode);
     setCountry(addr.country);
+    setLocationError(null);
+    setIsDetectingLocation(false);
     setShowAddressForm(true);
   };
 
@@ -77,6 +85,73 @@ export default function ProfileContainer({ initialUser }: ProfileContainerProps)
   const handleCancelForm = () => {
     setShowAddressForm(false);
     setEditingAddressId(null);
+    setLocationError(null);
+    setIsDetectingLocation(false);
+  };
+
+  // Handle auto-detecting current location using browser geolocation and Nominatim API
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    setIsDetectingLocation(true);
+    setLocationError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
+          );
+          if (!response.ok) {
+            throw new Error('Failed to retrieve location details.');
+          }
+          const data = await response.json();
+          const address = data.address || {};
+
+          // Construct street address dynamically
+          const streetParts = [];
+          
+          const houseNumber = address.house_number || address.building || '';
+          const road = address.road || '';
+          if (houseNumber && road) {
+            streetParts.push(`${houseNumber} ${road}`);
+          } else if (road) {
+            streetParts.push(road);
+          }
+
+          const sub = address.suburb || address.neighbourhood || address.residential || '';
+          if (sub) {
+            streetParts.push(sub);
+          }
+
+          if (streetParts.length === 0 && (address.amenity || address.shop)) {
+            streetParts.push(address.amenity || address.shop);
+          }
+
+          setStreet(streetParts.join(', ') || 'Current Location');
+          setCity(address.city || address.town || address.village || address.county || '');
+          setState(address.state || address.state_district || '');
+          setPostalCode(address.postcode || '');
+          setCountry(address.country || 'India');
+        } catch (err: any) {
+          setLocationError('Could not fetch address details. Please fill manually.');
+        } finally {
+          setIsDetectingLocation(false);
+        }
+      },
+      (error) => {
+        let msg = 'Unable to retrieve location.';
+        if (error.code === error.PERMISSION_DENIED) {
+          msg = 'Location access denied. Please enable location permissions.';
+        }
+        setLocationError(msg);
+        setIsDetectingLocation(false);
+      }
+    );
   };
 
   // Submit address form (handles add or edit)
@@ -197,6 +272,38 @@ export default function ProfileContainer({ initialUser }: ProfileContainerProps)
             <h3 className={styles.cardTitle}>
               {editingAddressId ? 'Edit Address' : 'Add New Address'}
             </h3>
+
+            {/* Geolocation autofill trigger button */}
+            <button
+              type="button"
+              onClick={handleDetectLocation}
+              disabled={isDetectingLocation}
+              className={styles.detectLocationBtn}
+              id="detect-location-btn"
+            >
+              {isDetectingLocation ? (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={styles.spinIcon} style={{ width: '14px', height: '14px', marginRight: '6px' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                  </svg>
+                  Detecting Location...
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: '14px', height: '14px', marginRight: '6px' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                  </svg>
+                  Use Current Location
+                </>
+              )}
+            </button>
+
+            {locationError && (
+              <span className={styles.locationError} id="location-detect-error">
+                {locationError}
+              </span>
+            )}
 
             <div className={styles.formGrid}>
               <div className={`${styles.inputGroup} ${styles.formFullWidth}`}>
