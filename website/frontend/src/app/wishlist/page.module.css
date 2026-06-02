@@ -1,0 +1,141 @@
+/* =========================================
+   BRAND DEALS — Wishlist Page Styles
+   ========================================= */
+
+.wrapper {
+  padding: var(--space-2xl) 0 var(--space-4xl) 0;
+}
+
+.header {
+  margin-bottom: var(--space-2xl);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-lg);
+}
+
+.title {
+  font-size: var(--text-4xl);
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+}
+
+.cardWrapper {
+  position: relative;
+  height: 100%;
+}
+
+.removeBtn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.removeBtn:hover {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+  color: #ffffff;
+  transform: scale(1.1) rotate(90deg);
+}
+
+.removeBtn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ---------- Empty State ---------- */
+.empty {
+  text-align: center;
+  padding: var(--space-4xl) var(--space-xl);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  max-width: 500px;
+  margin: var(--space-2xl) auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  color: var(--color-text-muted);
+}
+
+.emptyTitle {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.emptyDesc {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.shopBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm) var(--space-xl);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--color-accent);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+
+.shopBtn:hover {
+  background: var(--color-accent-hover);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .title {
+    font-size: var(--text-3xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
