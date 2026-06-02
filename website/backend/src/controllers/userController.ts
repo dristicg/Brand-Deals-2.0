@@ -12,16 +12,20 @@ export const getProfile = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  if (!req.user) {
-    return next(new AppError('Authentication required', 401));
-  }
+  try {
+    if (!req.user) {
+      return next(new AppError('Authentication required', 401));
+    }
 
-  res.status(200).json({
-    success: true,
-    data: {
-      user: req.user,
-    },
-  });
+    res.status(200).json({
+      success: true,
+      data: {
+        user: req.user,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 /**
@@ -33,40 +37,47 @@ export const updateProfile = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  if (!req.user) {
-    return next(new AppError('Authentication required', 401));
-  }
+  try {
+    if (!req.user) {
+      return next(new AppError('Authentication required', 401));
+    }
 
-  // Parse and validate request body
-  const validation = UpdateProfileSchema.safeParse(req.body);
-  if (!validation.success) {
-    return next(new AppError(validation.error.errors[0].message, 400));
-  }
+    // Parse and validate request body
+    const validation = UpdateProfileSchema.safeParse(req.body);
+    if (!validation.success) {
+      return next(new AppError(validation.error.errors[0].message, 400));
+    }
 
-  const { name, email } = validation.data;
+    const { name, email } = validation.data;
 
-  // Check email uniqueness if email is being updated
-  if (email && email !== req.user.email) {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    // Check email uniqueness if email is being updated
+    if (email && email !== req.user.email) {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return next(new AppError('Email address is already in use', 400));
+      }
+      req.user.email = email;
+    }
+
+    if (name) {
+      req.user.name = name;
+    }
+
+    const updatedUser = await req.user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: {
+        user: updatedUser,
+      },
+    });
+  } catch (error: any) {
+    if (error.code === 11000) {
       return next(new AppError('Email address is already in use', 400));
     }
-    req.user.email = email;
+    next(error);
   }
-
-  if (name) {
-    req.user.name = name;
-  }
-
-  const updatedUser = await req.user.save();
-
-  res.status(200).json({
-    success: true,
-    message: 'Profile updated successfully',
-    data: {
-      user: updatedUser,
-    },
-  });
 };
 
 /**
@@ -78,25 +89,29 @@ export const addAddress = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  if (!req.user) {
-    return next(new AppError('Authentication required', 401));
+  try {
+    if (!req.user) {
+      return next(new AppError('Authentication required', 401));
+    }
+
+    const validation = AddressSchema.safeParse(req.body);
+    if (!validation.success) {
+      return next(new AppError(validation.error.errors[0].message, 400));
+    }
+
+    req.user.savedAddresses.push(validation.data);
+    const updatedUser = await req.user.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Address added successfully',
+      data: {
+        addresses: updatedUser.savedAddresses,
+      },
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const validation = AddressSchema.safeParse(req.body);
-  if (!validation.success) {
-    return next(new AppError(validation.error.errors[0].message, 400));
-  }
-
-  req.user.savedAddresses.push(validation.data);
-  const updatedUser = await req.user.save();
-
-  res.status(201).json({
-    success: true,
-    message: 'Address added successfully',
-    data: {
-      addresses: updatedUser.savedAddresses,
-    },
-  });
 };
 
 /**
@@ -108,32 +123,36 @@ export const updateAddress = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  if (!req.user) {
-    return next(new AppError('Authentication required', 401));
+  try {
+    if (!req.user) {
+      return next(new AppError('Authentication required', 401));
+    }
+
+    const validation = AddressSchema.safeParse(req.body);
+    if (!validation.success) {
+      return next(new AppError(validation.error.errors[0].message, 400));
+    }
+
+    // Find address by sub-document ID
+    const address = (req.user.savedAddresses as any).id(req.params.addressId);
+    if (!address) {
+      return next(new AppError('Address not found', 404));
+    }
+
+    // Assign updated values
+    Object.assign(address, validation.data);
+    const updatedUser = await req.user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Address updated successfully',
+      data: {
+        addresses: updatedUser.savedAddresses,
+      },
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const validation = AddressSchema.safeParse(req.body);
-  if (!validation.success) {
-    return next(new AppError(validation.error.errors[0].message, 400));
-  }
-
-  // Find address by sub-document ID
-  const address = (req.user.savedAddresses as any).id(req.params.addressId);
-  if (!address) {
-    return next(new AppError('Address not found', 404));
-  }
-
-  // Assign updated values
-  Object.assign(address, validation.data);
-  const updatedUser = await req.user.save();
-
-  res.status(200).json({
-    success: true,
-    message: 'Address updated successfully',
-    data: {
-      addresses: updatedUser.savedAddresses,
-    },
-  });
 };
 
 /**
@@ -145,24 +164,28 @@ export const deleteAddress = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  if (!req.user) {
-    return next(new AppError('Authentication required', 401));
+  try {
+    if (!req.user) {
+      return next(new AppError('Authentication required', 401));
+    }
+
+    const address = (req.user.savedAddresses as any).id(req.params.addressId);
+    if (!address) {
+      return next(new AppError('Address not found', 404));
+    }
+
+    // Remove address using mongoose subdocument helper
+    address.deleteOne();
+    const updatedUser = await req.user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Address deleted successfully',
+      data: {
+        addresses: updatedUser.savedAddresses,
+      },
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const address = (req.user.savedAddresses as any).id(req.params.addressId);
-  if (!address) {
-    return next(new AppError('Address not found', 404));
-  }
-
-  // Remove address using mongoose subdocument helper
-  address.deleteOne();
-  const updatedUser = await req.user.save();
-
-  res.status(200).json({
-    success: true,
-    message: 'Address deleted successfully',
-    data: {
-      addresses: updatedUser.savedAddresses,
-    },
-  });
 };
