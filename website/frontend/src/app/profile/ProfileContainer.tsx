@@ -22,8 +22,10 @@ export default function ProfileContainer({ initialUser }: ProfileContainerProps)
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
 
-  // Address form fields
-  const [street, setStreet] = useState('');
+  // Address form fields (split representation of street)
+  const [flatHouse, setFlatHouse] = useState('');
+  const [areaStreet, setAreaStreet] = useState('');
+  const [landmark, setLandmark] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [postalCode, setPostalCode] = useState('');
@@ -57,7 +59,9 @@ export default function ProfileContainer({ initialUser }: ProfileContainerProps)
   // Open address form for adding
   const handleOpenAdd = () => {
     setEditingAddressId(null);
-    setStreet('');
+    setFlatHouse('');
+    setAreaStreet('');
+    setLandmark('');
     setCity('');
     setState('');
     setPostalCode('');
@@ -71,7 +75,13 @@ export default function ProfileContainer({ initialUser }: ProfileContainerProps)
   const handleOpenEdit = (addr: SavedAddress) => {
     if (!addr._id) return;
     setEditingAddressId(addr._id);
-    setStreet(addr.street);
+    
+    // Parse street back into split fields
+    const parts = addr.street.split(' | ');
+    setFlatHouse(parts[0] || '');
+    setAreaStreet(parts[1] || '');
+    setLandmark(parts[2] || '');
+
     setCity(addr.city);
     setState(addr.state);
     setPostalCode(addr.postalCode);
@@ -112,29 +122,33 @@ export default function ProfileContainer({ initialUser }: ProfileContainerProps)
           const data = await response.json();
           const address = data.address || {};
 
-          // Construct street address dynamically
-          const streetParts = [];
-          
-          const houseNumber = address.house_number || address.building || '';
-          const road = address.road || '';
-          if (houseNumber && road) {
-            streetParts.push(`${houseNumber} ${road}`);
-          } else if (road) {
-            streetParts.push(road);
-          }
+          // 1. Build Flat/House No. (house_number, building, office, amenity, shop)
+          const houseParts = [];
+          if (address.building) houseParts.push(address.building);
+          if (address.house_number) houseParts.push(address.house_number);
+          if (address.office) houseParts.push(address.office);
+          if (address.amenity) houseParts.push(address.amenity);
+          if (address.shop) houseParts.push(address.shop);
+          setFlatHouse(houseParts.join(', '));
 
-          const sub = address.suburb || address.neighbourhood || address.residential || '';
-          if (sub) {
-            streetParts.push(sub);
-          }
+          // 2. Build Street/Area/Colony (road, residential)
+          const roadParts = [];
+          if (address.road) roadParts.push(address.road);
+          if (address.residential) roadParts.push(address.residential);
+          setAreaStreet(roadParts.join(', '));
 
-          if (streetParts.length === 0 && (address.amenity || address.shop)) {
-            streetParts.push(address.amenity || address.shop);
-          }
+          // 3. Build Landmark (suburb, neighbourhood)
+          const landParts = [];
+          if (address.suburb) landParts.push(address.suburb);
+          if (address.neighbourhood) landParts.push(address.neighbourhood);
+          setLandmark(landParts.join(', '));
 
-          setStreet(streetParts.join(', ') || 'Current Location');
-          setCity(address.city || address.town || address.village || address.county || '');
-          setState(address.state || address.state_district || '');
+          // 4. Resolve City by prioritizing major city/district/county over village/suburb names
+          const detectedCity = address.city || address.state_district || address.county || address.town || address.village || '';
+          setCity(detectedCity);
+
+          // 5. State, Postal Code, Country
+          setState(address.state || '');
           setPostalCode(address.postcode || '');
           setCountry(address.country || 'India');
         } catch (err: any) {
@@ -157,7 +171,20 @@ export default function ProfileContainer({ initialUser }: ProfileContainerProps)
   // Submit address form (handles add or edit)
   const handleAddressSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const addressPayload = { street, city, state, postalCode, country };
+
+    // Combine split fields back into single street attribute using ' | ' delimiter
+    const combinedStreet = [
+      flatHouse.trim(),
+      areaStreet.trim(),
+      landmark.trim()
+    ].filter(Boolean).join(' | ');
+
+    if (!combinedStreet) {
+      setLocationError('Please fill in at least one address line.');
+      return;
+    }
+
+    const addressPayload = { street: combinedStreet, city, state, postalCode, country };
 
     if (editingAddressId) {
       // Edit mode
@@ -307,15 +334,40 @@ export default function ProfileContainer({ initialUser }: ProfileContainerProps)
 
             <div className={styles.formGrid}>
               <div className={`${styles.inputGroup} ${styles.formFullWidth}`}>
-                <label htmlFor="addr-street" className={styles.label}>Street / Landmark</label>
+                <label htmlFor="addr-flatHouse" className={styles.label}>Flat / House No. / Building / Society</label>
                 <input
                   type="text"
-                  id="addr-street"
-                  value={street}
-                  onChange={(e) => setStreet(e.target.value)}
-                  placeholder="e.g. Flat 302, Green Meadows, Bandra West"
+                  id="addr-flatHouse"
+                  value={flatHouse}
+                  onChange={(e) => setFlatHouse(e.target.value)}
+                  placeholder="e.g. Flat 405, Sea Breeze Apartments"
                   className={styles.input}
                   required
+                />
+              </div>
+
+              <div className={`${styles.inputGroup} ${styles.formFullWidth}`}>
+                <label htmlFor="addr-areaStreet" className={styles.label}>Area / Street / Colony / Sector</label>
+                <input
+                  type="text"
+                  id="addr-areaStreet"
+                  value={areaStreet}
+                  onChange={(e) => setAreaStreet(e.target.value)}
+                  placeholder="e.g. Juhu Tara Road, Juhu"
+                  className={styles.input}
+                  required
+                />
+              </div>
+
+              <div className={`${styles.inputGroup} ${styles.formFullWidth}`}>
+                <label htmlFor="addr-landmark" className={styles.label}>Landmark / Nearby (Optional)</label>
+                <input
+                  type="text"
+                  id="addr-landmark"
+                  value={landmark}
+                  onChange={(e) => setLandmark(e.target.value)}
+                  placeholder="e.g. Near Juhu Beach or Opp. Grand Hyatt"
+                  className={styles.input}
                 />
               </div>
 
@@ -404,7 +456,9 @@ export default function ProfileContainer({ initialUser }: ProfileContainerProps)
                   <div key={addr._id} className={`${styles.addressCard} glass-card`}>
                     <div className={styles.addressDetails}>
                       <span className={styles.addressTextBold}>Shipping Destination</span>
-                      <span>{addr.street}</span>
+                      {addr.street.split(' | ').map((line, idx) => (
+                        <span key={idx} style={{ display: 'block' }}>{line}</span>
+                      ))}
                       <span>{addr.city}, {addr.state} - {addr.postalCode}</span>
                       <span>{addr.country}</span>
                     </div>
