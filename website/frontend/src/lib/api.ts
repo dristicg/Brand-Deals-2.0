@@ -2,6 +2,11 @@ import type {
   ProductListResponse,
   ProductDetailResponse,
   ProductQueryParams,
+  CartResponse,
+  WishlistResponse,
+  ToggleWishlistResponse,
+  ProfileResponse,
+  AddressResponse,
 } from '@/types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
@@ -69,6 +74,251 @@ export async function fetchProductBySlug(
     return res.json();
   } catch (error) {
     console.error(`[API] Failed to fetch product "${slug}":`, error);
+    return null;
+  }
+}
+
+/* ========================================================
+   PERSISTENT CART, WISHLIST & PROFILE API EXTENSIONS (SPRINT 5)
+   ======================================================== */
+
+// Helper to get request options (handles method, JSON payload, and Cookie/Authorization)
+function getFetchOptions(method: string, body?: any, token?: string): RequestInit {
+  const headers: Record<string, string> = {};
+  if (body) {
+    headers['Content-Type'] = 'application/json';
+  }
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+    credentials: 'include', // Essential for HttpOnly cookie carrying in browser
+  };
+}
+
+/**
+ * Fetch authenticated user's cart
+ */
+export async function fetchCart(token?: string): Promise<CartResponse | null> {
+  const url = `${API_BASE}/cart`;
+  try {
+    const res = await fetch(url, getFetchOptions('GET', undefined, token));
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error('[API] fetchCart failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Add an item to the user's cart
+ */
+export async function addToCart(
+  productId: string,
+  size: number,
+  quantity: number = 1,
+  token?: string
+): Promise<CartResponse | null> {
+  const url = `${API_BASE}/cart`;
+  try {
+    const res = await fetch(
+      url,
+      getFetchOptions('POST', { productId, size, quantity }, token)
+    );
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error('[API] addToCart failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Update the quantity of a specific cart item
+ */
+export async function updateCartItem(
+  itemId: string,
+  quantity: number,
+  token?: string
+): Promise<CartResponse | null> {
+  const url = `${API_BASE}/cart/items/${itemId}`;
+  try {
+    const res = await fetch(url, getFetchOptions('PUT', { quantity }, token));
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error('[API] updateCartItem failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Remove an item from the cart
+ */
+export async function removeFromCart(
+  itemId: string,
+  token?: string
+): Promise<CartResponse | null> {
+  const url = `${API_BASE}/cart/items/${itemId}`;
+  try {
+    const res = await fetch(url, getFetchOptions('DELETE', undefined, token));
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error('[API] removeFromCart failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Clear the entire cart
+ */
+export async function clearCart(token?: string): Promise<CartResponse | null> {
+  const url = `${API_BASE}/cart`;
+  try {
+    const res = await fetch(url, getFetchOptions('DELETE', undefined, token));
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error('[API] clearCart failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Fetch authenticated user's wishlist
+ */
+export async function fetchWishlist(token?: string): Promise<WishlistResponse | null> {
+  const url = `${API_BASE}/wishlist`;
+  try {
+    const res = await fetch(url, getFetchOptions('GET', undefined, token));
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error('[API] fetchWishlist failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Toggle a product inside the user's wishlist
+ */
+export async function toggleWishlist(
+  productId: string,
+  token?: string
+): Promise<ToggleWishlistResponse | null> {
+  const url = `${API_BASE}/wishlist`;
+  try {
+    const res = await fetch(url, getFetchOptions('POST', { productId }, token));
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error('[API] toggleWishlist failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Fetch authenticated user's profile details
+ */
+export async function fetchProfile(token?: string): Promise<ProfileResponse | null> {
+  const url = `${API_BASE}/users/me`;
+  try {
+    const res = await fetch(url, getFetchOptions('GET', undefined, token));
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error('[API] fetchProfile failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Update authenticated user's credentials
+ */
+export async function updateProfile(
+  name?: string,
+  email?: string,
+  token?: string
+): Promise<ProfileResponse | null> {
+  const url = `${API_BASE}/users/me`;
+  try {
+    const res = await fetch(url, getFetchOptions('PUT', { name, email }, token));
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error('[API] updateProfile failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Add a new saved address
+ */
+export async function addAddress(
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  },
+  token?: string
+): Promise<AddressResponse | null> {
+  const url = `${API_BASE}/users/me/addresses`;
+  try {
+    const res = await fetch(url, getFetchOptions('POST', address, token));
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error('[API] addAddress failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Update an existing saved address
+ */
+export async function updateAddress(
+  addressId: string,
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  },
+  token?: string
+): Promise<AddressResponse | null> {
+  const url = `${API_BASE}/users/me/addresses/${addressId}`;
+  try {
+    const res = await fetch(url, getFetchOptions('PUT', address, token));
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error('[API] updateAddress failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Delete a specific saved address
+ */
+export async function deleteAddress(
+  addressId: string,
+  token?: string
+): Promise<AddressResponse | null> {
+  const url = `${API_BASE}/users/me/addresses/${addressId}`;
+  try {
+    const res = await fetch(url, getFetchOptions('DELETE', undefined, token));
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error('[API] deleteAddress failed:', error);
     return null;
   }
 }
