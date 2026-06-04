@@ -322,3 +322,104 @@ export async function deleteAddress(
     return null;
   }
 }
+
+/* ========================================================
+   CHECKOUT & ORDER MANAGEMENT API EXTENSIONS (SPRINT 6)
+   ======================================================== */
+
+import type { CreatePaymentResponse, OrderListResponse, OrderDetailResponse } from '../types';
+
+/**
+ * Create a Razorpay Order
+ */
+export async function createPaymentOrder(
+  addressId: string,
+  token?: string
+): Promise<CreatePaymentResponse | null> {
+  const url = `${API_BASE}/payments/create-order`;
+  try {
+    const res = await fetch(url, getFetchOptions('POST', { addressId }, token));
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'Failed to create payment order');
+    }
+    return res.json();
+  } catch (error) {
+    console.error('[API] createPaymentOrder failed:', error);
+    throw error;
+  }
+}
+
+/**
+ * Verify Razorpay Payment and create DB Order
+ */
+export async function verifyPayment(
+  paymentData: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+    addressId: string;
+  },
+  token?: string
+): Promise<OrderDetailResponse | null> {
+  const url = `${API_BASE}/payments/verify`;
+  try {
+    const res = await fetch(url, getFetchOptions('POST', paymentData, token));
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'Payment verification failed');
+    }
+    return res.json();
+  } catch (error) {
+    console.error('[API] verifyPayment failed:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch authenticated user's orders
+ */
+export async function fetchMyOrders(token?: string): Promise<OrderListResponse | null> {
+  const url = `${API_BASE}/orders`;
+  try {
+    const res = await fetch(url, getFetchOptions('GET', undefined, token));
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error('[API] fetchMyOrders failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Fetch a single order by ID
+ */
+export async function fetchOrderById(orderId: string, token?: string): Promise<OrderDetailResponse | null> {
+  const url = `${API_BASE}/orders/${orderId}`;
+  try {
+    const res = await fetch(url, getFetchOptions('GET', undefined, token));
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error('[API] fetchOrderById failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Cancel an order
+ */
+export async function cancelOrder(orderId: string, token?: string): Promise<OrderDetailResponse | null> {
+  const url = `${API_BASE}/orders/${orderId}/cancel`;
+  try {
+    const res = await fetch(url, getFetchOptions('PATCH', undefined, token));
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'Failed to cancel order');
+    }
+    return res.json();
+  } catch (error) {
+    console.error('[API] cancelOrder failed:', error);
+    throw error;
+  }
+}

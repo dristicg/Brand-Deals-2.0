@@ -156,3 +156,60 @@ export interface AddressResponse {
     addresses: SavedAddress[];
   };
 }
+
+/** Payment Details interface */
+export interface PaymentDetails {
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  status: 'pending' | 'paid' | 'failed';
+}
+
+/** Order Item interface */
+export interface OrderItem {
+  _id: string;
+  product: Product;
+  size: number;
+  quantity: number;
+  price: number;
+}
+
+/** Order interface */
+export interface Order {
+  _id: string;
+  orderNumber: string;
+  user: string;
+  items: OrderItem[];
+  shippingAddress: SavedAddress;
+  paymentDetails: PaymentDetails;
+  orderStatus: 'pending' | 'confirmed' | 'packed' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
+  totalAmount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** API response for Razorpay Order creation */
+export interface CreatePaymentResponse {
+  success: boolean;
+  data: {
+    orderId: string;
+    amount: number;
+    currency: string;
+    addressId: string;
+  };
+}
+
+/** API response for listing orders */
+export interface OrderListResponse {
+  success: boolean;
+  data: {
+    orders: Order[];
+  };
+}
+
+/** API response for a single order */
+export interface OrderDetailResponse {
+  success: boolean;
+  data: {
+    order: Order;
+  };
+}
