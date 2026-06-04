@@ -8,6 +8,8 @@ import productRoutes from './routes/productRoutes';
 import userRoutes from './routes/userRoutes';
 import cartRoutes from './routes/cartRoutes';
 import wishlistRoutes from './routes/wishlistRoutes';
+import paymentRoutes from './routes/paymentRoutes';
+import orderRoutes from './routes/orderRoutes';
 
 const app = express();
 
@@ -59,6 +61,8 @@ app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/cart', cartRoutes);
 app.use('/api/v1/wishlist', wishlistRoutes);
+app.use('/api/v1/payments', paymentRoutes);
+app.use('/api/v1/orders', orderRoutes);
 
 // Unhandled route fallback
 app.use('*', (req: Request, res: Response) => {
