@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { fetchProductBySlug } from '@/lib/api';
 import type { Product } from '@/types';
 import ProductDetailsSection from './ProductDetailsSection';
+import ProductReviews from '@/components/Reviews/ProductReviews';
 import styles from './page.module.css';
 
 // Rich mock database to fall back on if API is not running/empty
@@ -293,42 +294,12 @@ export default async function ProductDetailPage({ params }: Props) {
                 </svg>
                 <span className={styles.guaranteeText}>100% Original</span>
               </div>
-              <div className={styles.guaranteeItem}>
-                <svg className={styles.guaranteeIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                <span className={styles.guaranteeText}>Cash on Delivery</span>
-              </div>
-              <div className={styles.guaranteeItem}>
-                <svg className={styles.guaranteeIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89H18" />
-                </svg>
-                <span className={styles.guaranteeText}>Easy 10D Returns</span>
-              </div>
             </div>
           </div>
         </div>
 
-        {/* Reviews Section */}
-        <section className={styles.reviewsSection} aria-label="Customer Reviews">
-          <h2 className={styles.reviewsHeader}>Customer Reviews</h2>
-          <div className={styles.reviewsGrid}>
-            {mockReviews.map((rev) => (
-              <div key={rev.id} className={styles.reviewCard}>
-                <div className={styles.reviewUserRow}>
-                  <span className={styles.reviewUser}>{rev.user}</span>
-                  <span className={styles.reviewDate}>{rev.date}</span>
-                </div>
-                <div style={{ color: 'var(--color-warning)', fontSize: '14px' }}>
-                  {Array.from({ length: rev.rating }).map((_, i) => (
-                    <span key={i}>&#9733;</span>
-                  ))}
-                </div>
-                <p className={styles.reviewText}>{rev.comment}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* Dynamic Reviews Section */}
+        <ProductReviews productId={product._id} />
       </div>
     </div>
   );
