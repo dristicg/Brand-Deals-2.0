@@ -213,3 +213,38 @@ export interface OrderDetailResponse {
     order: Order;
   };
 }
+
+/* ========================================================
+   REVIEWS & RATINGS (SPRINT 7)
+   ======================================================== */
+
+/** Review interface */
+export interface Review {
+  _id: string;
+  user: {
+    _id: string;
+    name: string;
+  };
+  product: string;
+  rating: number;
+  review: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** API response for listing reviews */
+export interface ReviewListResponse {
+  success: boolean;
+  data: {
+    reviews: Review[];
+  };
+}
+
+/** API response for creating a review */
+export interface CreateReviewResponse {
+  success: boolean;
+  message: string;
+  data: {
+    review: Review;
+  };
+}

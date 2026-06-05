@@ -257,6 +257,29 @@ export async function updateProfile(
 }
 
 /**
+ * Add an item to the cart
+ */
+export async function addToCart(
+  productId: string,
+  size: number,
+  quantity: number = 1,
+  token?: string
+): Promise<any | null> {
+  const url = `${API_BASE}/cart`;
+  try {
+    const res = await fetch(url, getFetchOptions('POST', { productId, size, quantity }, token));
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'Failed to add item to cart');
+    }
+    return res.json();
+  } catch (error) {
+    console.error('[API] addToCart failed:', error);
+    throw error;
+  }
+}
+
+/**
  * Add a new saved address
  */
 export async function addAddress(
@@ -420,6 +443,48 @@ export async function cancelOrder(orderId: string, token?: string): Promise<Orde
     return res.json();
   } catch (error) {
     console.error('[API] cancelOrder failed:', error);
+    throw error;
+  }
+}
+
+/* ========================================================
+   REVIEWS & RATINGS API EXTENSIONS (SPRINT 7)
+   ======================================================== */
+
+/**
+ * Fetch reviews for a product
+ */
+export async function fetchProductReviews(productId: string): Promise<any | null> {
+  const url = `${API_BASE}/reviews/${productId}`;
+  try {
+    const res = await fetch(url, getFetchOptions('GET'));
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error('[API] fetchProductReviews failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Submit a new review for a product
+ */
+export async function submitReview(
+  productId: string,
+  rating: number,
+  review: string,
+  token?: string
+): Promise<any | null> {
+  const url = `${API_BASE}/reviews/${productId}`;
+  try {
+    const res = await fetch(url, getFetchOptions('POST', { rating, review }, token));
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'Failed to submit review');
+    }
+    return res.json();
+  } catch (error) {
+    console.error('[API] submitReview failed:', error);
     throw error;
   }
 }
