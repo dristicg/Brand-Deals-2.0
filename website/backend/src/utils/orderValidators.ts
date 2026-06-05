@@ -4,6 +4,7 @@ export const CreateRazorpayOrderSchema = z.object({
   addressId: z.string({
     required_error: 'Address ID is required',
   }).min(1, 'Address ID cannot be empty'),
+  couponCode: z.string().optional(),
 });
 
 export const VerifyPaymentSchema = z.object({
@@ -16,6 +17,7 @@ export const VerifyPaymentSchema = z.object({
   razorpay_signature: z.string({
     required_error: 'Razorpay signature is required',
   }),
+  couponCode: z.string().optional(),
 });
 
 export const UpdateOrderStatusSchema = z.object({

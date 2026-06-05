@@ -22,6 +22,8 @@ export interface IOrder extends Document {
   };
   orderStatus: 'pending' | 'confirmed' | 'packed' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
   totalAmount: number;
+  couponUsed?: mongoose.Types.ObjectId;
+  discountAmount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -103,6 +105,15 @@ const OrderSchema = new Schema<IOrder>(
       type: Number,
       required: [true, 'Total amount is required'],
       min: [0, 'Total amount cannot be negative'],
+    },
+    couponUsed: {
+      type: Schema.Types.ObjectId,
+      ref: 'Coupon',
+    },
+    discountAmount: {
+      type: Number,
+      default: 0,
+      min: [0, 'Discount amount cannot be negative'],
     },
   },
   {
