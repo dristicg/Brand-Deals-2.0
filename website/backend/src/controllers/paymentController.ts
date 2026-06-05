@@ -4,6 +4,8 @@ import crypto from 'crypto';
 import Cart from '../models/Cart';
 import Order from '../models/Order';
 import Product from '../models/Product';
+import Coupon from '../models/Coupon';
+import { checkCouponValidity, calculateCouponDiscount } from './couponController';
 import { AppError } from '../utils/AppError';
 import { CreateRazorpayOrderSchema, VerifyPaymentSchema } from '../utils/orderValidators';
 import mongoose from 'mongoose';
@@ -70,7 +72,20 @@ export const createOrder = async (
       totalAmount += product.price * item.quantity;
     }
 
-    // Note: In real app with coupons, you'd apply discount here
+    let discountAmount = 0;
+
+    if (couponCode) {
+      const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
+      if (!coupon) {
+        return next(new AppError('Invalid coupon code', 404));
+      }
+      const validity = checkCouponValidity(coupon, req.user._id as string, totalAmount);
+      if (!validity.isValid) {
+        return next(new AppError(validity.error || 'Coupon validation failed', 400));
+      }
+      discountAmount = calculateCouponDiscount(coupon, totalAmount);
+      totalAmount = Math.max(0, totalAmount - discountAmount);
+    }
 
     // Create Razorpay Order
     const options = {
@@ -116,7 +131,7 @@ export const verifyPayment = async (
       return next(new AppError(validation.error.errors[0].message, 400));
     }
 
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = validation.data;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, couponCode } = validation.data;
     
     // addressId should be passed back from frontend or we could store it temporarily,
     // but typically it's sent along with the verify request or stored in a pending order.
@@ -169,6 +184,20 @@ export const verifyPayment = async (
       totalAmount += product.price * item.quantity;
     }
 
+    let discountAmount = 0;
+    let coupon = null;
+
+    if (couponCode) {
+      coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
+      if (coupon) {
+        const validity = checkCouponValidity(coupon, req.user._id as string, totalAmount);
+        if (validity.isValid) {
+          discountAmount = calculateCouponDiscount(coupon, totalAmount);
+          totalAmount = Math.max(0, totalAmount - discountAmount);
+        }
+      }
+    }
+
     const session = await mongoose.startSession();
     let orderId, orderNumber;
 
@@ -193,6 +222,8 @@ export const verifyPayment = async (
           },
           orderStatus: 'confirmed',
           totalAmount,
+          couponUsed: coupon ? coupon._id : undefined,
+          discountAmount,
         }], { session });
 
         const order = orderArr[0];
@@ -208,7 +239,41 @@ export const verifyPayment = async (
           );
         }
 
-        // 3. Clear the Cart
+        // 3. Update Coupon usage if used
+        if (coupon) {
+          const userUsageIndex = coupon.usersUsed.findIndex(
+            (uu) => uu.user.toString() === req.user!._id.toString()
+          );
+
+          if (userUsageIndex > -1) {
+            await Coupon.updateOne(
+              { _id: coupon._id, 'usersUsed.user': req.user!._id },
+              {
+                $inc: {
+                  usageCount: 1,
+                  'usersUsed.$.count': 1
+                }
+              },
+              { session }
+            );
+          } else {
+            await Coupon.updateOne(
+              { _id: coupon._id },
+              {
+                $inc: { usageCount: 1 },
+                $push: {
+                  usersUsed: {
+                    user: req.user!._id,
+                    count: 1
+                  }
+                }
+              },
+              { session }
+            );
+          }
+        }
+
+        // 4. Clear the Cart
         cart.items = [];
         await cart.save({ session });
       });
