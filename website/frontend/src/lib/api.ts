@@ -114,28 +114,6 @@ export async function fetchCart(token?: string): Promise<CartResponse | null> {
   }
 }
 
-/**
- * Add an item to the user's cart
- */
-export async function addToCart(
-  productId: string,
-  size: number,
-  quantity: number = 1,
-  token?: string
-): Promise<CartResponse | null> {
-  const url = `${API_BASE}/cart`;
-  try {
-    const res = await fetch(
-      url,
-      getFetchOptions('POST', { productId, size, quantity }, token)
-    );
-    if (!res.ok) return null;
-    return res.json();
-  } catch (error) {
-    console.error('[API] addToCart failed:', error);
-    return null;
-  }
-}
 
 /**
  * Update the quantity of a specific cart item
