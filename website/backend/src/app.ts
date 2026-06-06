@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import compression from 'compression';
+import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './routes/authRoutes';
@@ -29,9 +31,15 @@ app.use(
   })
 );
 
+// Response compression
+app.use(compression());
+
 // Body parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+// Sanitize user input to prevent NoSQL query injection
+app.use(mongoSanitize());
 
 // Global Rate Limiting
 const limiter = rateLimit({
