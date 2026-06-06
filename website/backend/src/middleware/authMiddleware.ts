@@ -31,8 +31,12 @@ export const protect = async (
   // Retrieve token from Authorization header or from cookies
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
-  } else if ((req as any).cookies?.token) {
-    token = (req as any).cookies.token;
+  } else if (req.headers.cookie) {
+    const rawCookies = req.headers.cookie.split(';');
+    const tokenCookie = rawCookies.find((c) => c.trim().startsWith('token='));
+    if (tokenCookie) {
+      token = tokenCookie.split('=')[1].trim();
+    }
   }
 
   // Ensure token exists
