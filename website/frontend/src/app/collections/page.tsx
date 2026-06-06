@@ -8,7 +8,7 @@ import styles from './page.module.css';
 // Rich set of fallback products for high-fidelity catalog filtering
 const ALL_MOCK_PRODUCTS: Product[] = [
   {
-    _id: 'mock-1',
+    _id: '65e8a712f5a65c92c8123451',
     name: 'Nike Air Max Plus "Scarlet"',
     slug: 'nike-air-max-plus-scarlet',
     brand: 'Nike',
@@ -26,7 +26,7 @@ const ALL_MOCK_PRODUCTS: Product[] = [
     updatedAt: '2026-05-15T10:00:00Z',
   },
   {
-    _id: 'mock-2',
+    _id: '65e8a712f5a65c92c8123452',
     name: 'Adidas Ultraboost 1.0 "Cloud"',
     slug: 'adidas-ultraboost-1-0-cloud',
     brand: 'Adidas',
@@ -44,7 +44,7 @@ const ALL_MOCK_PRODUCTS: Product[] = [
     updatedAt: '2026-05-20T10:00:00Z',
   },
   {
-    _id: 'mock-3',
+    _id: '65e8a712f5a65c92c8123453',
     name: 'Puma RS-X "Slate Neon"',
     slug: 'puma-rs-x-slate-neon',
     brand: 'Puma',
@@ -62,8 +62,8 @@ const ALL_MOCK_PRODUCTS: Product[] = [
     updatedAt: '2026-05-10T10:00:00Z',
   },
   {
-    _id: 'mock-4',
-    name: 'Skechers D\'Lites "Bold Retro"',
+    _id: '65e8a712f5a65c92c8123454',
+    name: "Skechers D'Lites \"Bold Retro\"",
     slug: 'skechers-dlites-bold-retro',
     brand: 'Skechers',
     category: 'Lifestyle',
@@ -80,7 +80,7 @@ const ALL_MOCK_PRODUCTS: Product[] = [
     updatedAt: '2026-05-05T10:00:00Z',
   },
   {
-    _id: 'mock-5',
+    _id: '65e8a712f5a65c92c8123455',
     name: 'Nike Air Force 1 "Cosmic Shadow"',
     slug: 'nike-air-force-1-cosmic-shadow',
     brand: 'Nike',
@@ -98,7 +98,7 @@ const ALL_MOCK_PRODUCTS: Product[] = [
     updatedAt: '2026-05-18T10:00:00Z',
   },
   {
-    _id: 'mock-6',
+    _id: '65e8a712f5a65c92c8123456',
     name: 'Adidas NMD_R1 "Night Tech"',
     slug: 'adidas-nmd-r1-night-tech',
     brand: 'Adidas',
@@ -116,7 +116,7 @@ const ALL_MOCK_PRODUCTS: Product[] = [
     updatedAt: '2026-05-12T10:00:00Z',
   },
   {
-    _id: 'mock-7',
+    _id: '65e8a712f5a65c92c8123457',
     name: 'Reebok Nano X4 "Elite Trainer"',
     slug: 'reebok-nano-x4-elite-trainer',
     brand: 'Reebok',
@@ -134,7 +134,7 @@ const ALL_MOCK_PRODUCTS: Product[] = [
     updatedAt: '2026-05-22T10:00:00Z',
   },
   {
-    _id: 'mock-8',
+    _id: '65e8a712f5a65c92c8123458',
     name: 'Puma Kids Smash v2 "Active"',
     slug: 'puma-kids-smash-v2-active',
     brand: 'Puma',

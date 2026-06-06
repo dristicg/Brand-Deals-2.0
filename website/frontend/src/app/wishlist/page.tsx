@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 // Fallback high-fidelity wishlist items if database is empty/offline
 const FALLBACK_WISHLIST_PRODUCTS: Product[] = [
   {
-    _id: 'mock-1',
+    _id: '65e8a712f5a65c92c8123451',
     name: 'Nike Air Max Plus "Scarlet"',
     slug: 'nike-air-max-plus-scarlet',
     brand: 'Nike',
@@ -31,7 +31,7 @@ const FALLBACK_WISHLIST_PRODUCTS: Product[] = [
     updatedAt: new Date().toISOString(),
   },
   {
-    _id: 'mock-2',
+    _id: '65e8a712f5a65c92c8123452',
     name: 'Adidas Ultraboost 1.0 "Cloud"',
     slug: 'adidas-ultraboost-1-0-cloud',
     brand: 'Adidas',

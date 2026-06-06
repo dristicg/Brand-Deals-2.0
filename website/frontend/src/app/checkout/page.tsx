@@ -71,8 +71,8 @@ export default function CheckoutPage() {
       // 1. Create Order on Backend
       const orderRes = await createPaymentOrder(selectedAddressId);
       
-      if (!orderRes.success) {
-        throw new Error(orderRes.message || 'Failed to initialize payment');
+      if (!orderRes || !orderRes.success) {
+        throw new Error(orderRes?.message || 'Failed to initialize payment');
       }
 
       const { orderId, amount, currency } = orderRes.data;
@@ -95,11 +95,11 @@ export default function CheckoutPage() {
               addressId: selectedAddressId
             });
 
-            if (verifyRes.success) {
+            if (verifyRes && verifyRes.success) {
               // Redirect to success page
               router.push(`/checkout/success?order=${verifyRes.data.orderNumber}`);
             } else {
-              setError('Payment verification failed. Please contact support.');
+              setError(verifyRes?.message || 'Payment verification failed. Please contact support.');
               setIsProcessing(false);
             }
           } catch (err: any) {

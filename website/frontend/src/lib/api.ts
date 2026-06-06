@@ -328,7 +328,7 @@ export async function deleteAddress(
    CHECKOUT & ORDER MANAGEMENT API EXTENSIONS (SPRINT 6)
    ======================================================== */
 
-import type { CreatePaymentResponse, OrderListResponse, OrderDetailResponse } from '../types';
+import type { CreatePaymentResponse, OrderListResponse, OrderDetailResponse, VerifyPaymentResponse } from '../types';
 
 /**
  * Create a Razorpay Order
@@ -362,7 +362,7 @@ export async function verifyPayment(
     addressId: string;
   },
   token?: string
-): Promise<OrderDetailResponse | null> {
+): Promise<VerifyPaymentResponse | null> {
   const url = `${API_BASE}/payments/verify`;
   try {
     const res = await fetch(url, getFetchOptions('POST', paymentData, token));

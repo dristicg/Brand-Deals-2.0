@@ -190,11 +190,22 @@ export interface Order {
 /** API response for Razorpay Order creation */
 export interface CreatePaymentResponse {
   success: boolean;
+  message?: string;
   data: {
     orderId: string;
     amount: number;
     currency: string;
     addressId: string;
+  };
+}
+
+/** API response for Razorpay Payment verification */
+export interface VerifyPaymentResponse {
+  success: boolean;
+  message?: string;
+  data: {
+    orderId: string;
+    orderNumber: string;
   };
 }
 
