@@ -40,7 +40,7 @@ export const createOrder = async (
     if (!validation.success) {
       return next(new AppError(validation.error.errors[0].message, 400));
     }
-    const { addressId } = validation.data;
+    const { addressId, couponCode } = validation.data;
 
     // Validate that the address exists in the user's profile
     const address = (req.user.savedAddresses as any).id(addressId);
@@ -79,7 +79,7 @@ export const createOrder = async (
       if (!coupon) {
         return next(new AppError('Invalid coupon code', 404));
       }
-      const validity = checkCouponValidity(coupon, req.user._id as string, totalAmount);
+      const validity = checkCouponValidity(coupon, req.user._id.toString(), totalAmount);
       if (!validity.isValid) {
         return next(new AppError(validity.error || 'Coupon validation failed', 400));
       }
@@ -170,7 +170,7 @@ export const verifyPayment = async (
     }
 
     // Build order items and calculate total
-    const orderItems = [];
+    const orderItems: any[] = [];
     let totalAmount = 0;
 
     for (const item of cart.items) {
@@ -190,7 +190,7 @@ export const verifyPayment = async (
     if (couponCode) {
       coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
       if (coupon) {
-        const validity = checkCouponValidity(coupon, req.user._id as string, totalAmount);
+        const validity = checkCouponValidity(coupon, req.user._id.toString(), totalAmount);
         if (validity.isValid) {
           discountAmount = calculateCouponDiscount(coupon, totalAmount);
           totalAmount = Math.max(0, totalAmount - discountAmount);

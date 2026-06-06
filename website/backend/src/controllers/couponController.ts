@@ -224,7 +224,7 @@ export const validateCoupon = async (req: Request, res: Response, next: NextFunc
     }
 
     // Check validity
-    const validity = checkCouponValidity(coupon, req.user._id as string, cartTotal);
+    const validity = checkCouponValidity(coupon, req.user._id.toString(), cartTotal);
     if (!validity.isValid) {
       return next(new AppError(validity.error || 'Coupon validation failed', 400));
     }
