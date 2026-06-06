@@ -36,6 +36,7 @@ export default function ProductDetailsSection({ product }: ProductDetailsSection
         // Calculate total items in cart
         const totalItems = res.data.cart.items.reduce((acc: number, item: any) => acc + item.quantity, 0);
         setCartCount(totalItems);
+        window.dispatchEvent(new CustomEvent('cart-update', { detail: { count: totalItems } }));
         
         // Auto-reset "Added" message after 4 seconds
         setTimeout(() => setAdded(false), 4000);

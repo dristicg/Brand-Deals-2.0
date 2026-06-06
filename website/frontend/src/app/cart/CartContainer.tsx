@@ -22,7 +22,11 @@ export default function CartContainer({ initialItems }: CartContainerProps) {
     setUpdatingItemId(itemId);
 
     // Call API
-    await updateCartItem(itemId, newQty);
+    const res = await updateCartItem(itemId, newQty);
+    if (res?.success && res.data.cart) {
+      const totalItems = res.data.cart.items.reduce((acc: number, item: any) => acc + item.quantity, 0);
+      window.dispatchEvent(new CustomEvent('cart-update', { detail: { count: totalItems } }));
+    }
 
     // Update locally immediately for responsiveness
     setItems((prev) =>
@@ -38,7 +42,16 @@ export default function CartContainer({ initialItems }: CartContainerProps) {
     if (updatingItemId) return;
     setUpdatingItemId(itemId);
 
-    await removeFromCart(itemId);
+    const res = await removeFromCart(itemId);
+    if (res?.success && res.data.cart) {
+      const totalItems = res.data.cart.items.reduce((acc: number, item: any) => acc + item.quantity, 0);
+      window.dispatchEvent(new CustomEvent('cart-update', { detail: { count: totalItems } }));
+    } else {
+      // Demo / offline fallback local calculation
+      const remaining = items.filter((item) => item._id !== itemId);
+      const totalItems = remaining.reduce((acc, item) => acc + item.quantity, 0);
+      window.dispatchEvent(new CustomEvent('cart-update', { detail: { count: totalItems } }));
+    }
 
     // Update locally
     setItems((prev) => prev.filter((item) => item._id !== itemId));

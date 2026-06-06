@@ -125,3 +125,22 @@
     display: flex;
   }
 }
+
+.badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  background: var(--color-accent);
+  border-radius: var(--radius-full);
+  border: 1.5px solid #0a0a0a;
+}
