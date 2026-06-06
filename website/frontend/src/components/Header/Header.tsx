@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import styles from './Header.module.css';
+import HeaderClient from './HeaderClient';
 
 export default async function Header() {
   const cookieStore = await cookies();
   const isLoggedIn = !!cookieStore.get('token')?.value;
   return (
-    <header className={styles.header} id="site-header">
+    <HeaderClient>
+      <header className={styles.header} id="site-header">
       <div className={styles.headerInner}>
         {/* Logo */}
         <Link href="/" className={styles.logo}>
@@ -67,6 +69,7 @@ export default async function Header() {
           </button>
         </div>
       </div>
-    </header>
+      </header>
+    </HeaderClient>
   );
 }

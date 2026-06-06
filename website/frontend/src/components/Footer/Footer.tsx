@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import styles from './Footer.module.css';
+import FooterClient from './FooterClient';
 
 export default function Footer() {
   return (
-    <footer className={styles.footer} id="site-footer">
+    <FooterClient>
+      <footer className={styles.footer} id="site-footer">
       <div className={styles.footerInner}>
         <div className={styles.footerGrid}>
           {/* Brand */}
@@ -71,6 +73,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-    </footer>
+      </footer>
+    </FooterClient>
   );
 }
