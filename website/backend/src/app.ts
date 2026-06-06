@@ -12,6 +12,7 @@ import paymentRoutes from './routes/paymentRoutes';
 import orderRoutes from './routes/orderRoutes';
 import reviewRoutes from './routes/reviewRoutes';
 import couponRoutes from './routes/couponRoutes';
+import dashboardRoutes from './routes/dashboardRoutes';
 
 const app = express();
 
@@ -67,6 +68,7 @@ app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/coupons', couponRoutes);
+app.use('/api/v1/dashboard', dashboardRoutes);
 
 // Unhandled route fallback
 app.use('*', (req: Request, res: Response) => {
